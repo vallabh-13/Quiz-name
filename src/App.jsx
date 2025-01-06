@@ -54,16 +54,13 @@ const elements = {
 function App() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState([]);
-  
   const [userName, setUserName] = useState("");
-
   const [element, setElement] = useState("");
-
   const [artwork, setArtwork] = useState(null);
 
   function handleAnswer(answer) {
-    setAnswers([...answers, answer]);
-    setCurrentQuestionIndex(currentQuestionIndex + 1);
+    setAnswers((prevAnswers) => [...prevAnswers, answer]);
+    setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
   }
 
   function handleUserFormSubmit(name) {
@@ -83,12 +80,10 @@ function App() {
     try {
       const response = await fetch(`https://collectionapi.metmuseum.org/public/collection/v1/search?q=${keyword}`);
       const data = await response.json();
-      if (data.objectIDs && data.objectIDs.length > 0) { 
-
+      if (data.objectIDs && data.objectIDs.length > 0) {
         const objectID = data.objectIDs[0];
         const artworkResponse = await fetch(`https://collectionapi.metmuseum.org/public/collection/v1/objects/${objectID}`);
         const artworkData = await artworkResponse.json();
-
         setArtwork(artworkData);
       } else {
         setArtwork(null);
@@ -103,7 +98,6 @@ function App() {
     if (currentQuestionIndex === questions.length) {
       const selectedElement = determineElement(answers);
       setElement(selectedElement);
-
       fetchArtwork(keywords[selectedElement]);
     }
   }, [currentQuestionIndex]);
@@ -111,13 +105,12 @@ function App() {
   return (
     <UserProvider>
       <Router>
-        <Header /> 
+        <Header />
         <Routes>
           <Route path="/" element={<UserForm onSubmit={handleUserFormSubmit} />} />
           <Route
             path="/quiz"
             element={
-
               currentQuestionIndex < questions.length ? (
                 <Question question={questions[currentQuestionIndex].question} options={questions[currentQuestionIndex].options} onAnswer={handleAnswer} />
               ) : (
